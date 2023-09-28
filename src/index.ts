@@ -1,6 +1,6 @@
 import express from 'express'
 import userRouters from './routes/users.routes'
-import databaseConnect from './services/database.services'
+import databaseService from './services/database.services'
 import dotenv from 'dotenv'
 
 const app = express()
@@ -10,7 +10,7 @@ dotenv.config()
 
 // Middlewares
 // parse req.body
-databaseConnect.run()
+databaseService.run()
 app.use(express.json())
 app.use('/api', router)
 app.use('/users', userRouters)
