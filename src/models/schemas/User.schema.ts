@@ -45,8 +45,7 @@ export default class User {
     this.date_of_birth = user.date_of_birth || new Date()
     this.password = user.password
     this.email_verify_token = user.email_verify_token || ''
-    this.forgot_password_token =
-      user.forgot_password_token || ''
+    this.forgot_password_token = user.forgot_password_token || ''
     this.verify = user.verify || UserVerifyStatus.Unverified
     this.bio = user.bio || ''
     this.location = user.location || ''

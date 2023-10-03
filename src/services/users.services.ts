@@ -38,12 +38,10 @@ class UserService {
       })
     )
     const user_id = result.insertedId.toString()
-    const [access_token, refresh_token] = await Promise.all(
-      [
-        this.signAccessToken(user_id),
-        this.signRefreshToken(user_id)
-      ]
-    )
+    const [access_token, refresh_token] = await Promise.all([
+      this.signAccessToken(user_id),
+      this.signRefreshToken(user_id)
+    ])
     return {
       access_token,
       refresh_token
