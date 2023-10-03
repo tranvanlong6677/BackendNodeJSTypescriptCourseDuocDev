@@ -5,7 +5,7 @@ import { validate } from '../utils/validation'
 import { wrapRequestHandler } from '~/utils/handlers'
 const userRouters = Router()
 
-userRouters.post('/login', loginValidator, loginController)
+userRouters.post('/login', validate(loginValidator), wrapRequestHandler(loginController))
 userRouters.post(
   '/register',
   validate(registerValidator),

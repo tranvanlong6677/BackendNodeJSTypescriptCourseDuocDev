@@ -11,7 +11,6 @@ export const validate = (validation: RunnableValidationChains<ValidationChain>) 
     next: express.NextFunction
   ) => {
     await validation.run(req)
-
     const errors = validationResult(req)
     const errorsObject = errors.mapped()
     const entityError = new EntityError({ errors: {} })

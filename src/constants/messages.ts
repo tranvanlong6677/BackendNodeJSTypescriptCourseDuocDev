@@ -20,5 +20,8 @@ export const userMessage = {
   CONFIRM_PASSWORD_MUST_BE_THE_SAME_AS_PASSWORD:
     'Confirm password must be the same as password',
   DATE_OF_BIRTH_IS_REQUIRED: 'Date of birth is required',
-  DATE_OF_BIRTH_MUST_BE_ISO8601: 'Date of birth must be ISO 8601'
+  DATE_OF_BIRTH_MUST_BE_ISO8601: 'Date of birth must be ISO 8601',
+  EMAIL_OR_PASSWORD_IS_INCORRECT: 'Email or password is incorrect',
+  LOGIN_SUCCESS: 'Login successful',
+  REGISTER_SUCCESS: 'Registration successful'
 } as const

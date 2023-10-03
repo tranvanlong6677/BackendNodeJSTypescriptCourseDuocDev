@@ -1,4 +1,7 @@
 import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+
+dotenv.config()
 interface signInput {
   payload: string | Buffer | object
   privateKey?: string
