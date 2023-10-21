@@ -19,5 +19,4 @@ export const defaultErrorHandler = (
     message: err.message,
     error: omit(err, ['stack'])
   })
-  console.log(err)
 }

@@ -39,6 +39,9 @@ class DatabaseService {
   get refreshToken(): Collection<RefreshToken> {
     return this.db.collection('refresh_tokens')
   }
+  // get emailVerifyTokens(): Collection<RefreshToken> {
+  //   return this.db.collection('email_verify_tokens')
+  // }
 }
 const databaseService = new DatabaseService()
 export default databaseService
