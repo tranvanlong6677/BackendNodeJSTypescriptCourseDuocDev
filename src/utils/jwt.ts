@@ -41,7 +41,6 @@ export const verifyToken = ({
       console.log('decoded', decoded)
 
       if (error) {
-        console.log(111)
         console.log('error', error)
         throw reject(error)
       }

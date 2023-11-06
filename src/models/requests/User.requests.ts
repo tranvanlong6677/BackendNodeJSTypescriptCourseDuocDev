@@ -28,3 +28,13 @@ export interface TokenPayload extends JwtPayload {
 export interface ForgotPasswordRequestBody {
   email: string
 }
+
+export interface VerifyForgotPasswordRequestBody {
+  forgot_password_token: string
+}
+
+export interface ResetPasswordRequest {
+  forgot_password_token: string
+  password: string
+  confirm_password: string
+}
