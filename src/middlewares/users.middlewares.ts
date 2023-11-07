@@ -1,13 +1,16 @@
+import { NextFunction } from 'express'
 import { ParamSchema, checkSchema } from 'express-validator'
 import { JsonWebTokenError } from 'jsonwebtoken'
 import { ObjectId } from 'mongodb'
 import httpStatus from '~/constants/httpStatus'
 import { userMessage } from '~/constants/messages'
 import { ErrorWithStatus } from '~/models/Erros'
+import { TokenPayload } from '~/models/requests/User.requests'
 import userRouters from '~/routes/users.routes'
 import databaseService from '~/services/database.services'
 import userServices from '~/services/users.services'
 import { hashPassword } from '~/utils/crypto'
+import { UserVerifyStatus } from '~/utils/enums'
 import { verifyToken } from '~/utils/jwt'
 import { validate } from '~/utils/validation'
 const passwordSchema: ParamSchema = {
@@ -120,25 +123,55 @@ const forgotPasswordTokenSchema: ParamSchema = {
     }
   }
 }
+
+const imageSchema: ParamSchema = {
+  optional: true,
+  isString: {
+    errorMessage: userMessage.IMAGE_URL_MUST_BE_A_STRING
+  },
+  isLength: {
+    options: {
+      min: 1,
+      max: 400
+    },
+    errorMessage: userMessage.IMAGE_URL_LENGTH
+  },
+  trim: true
+}
+
+const dateOfBirthSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: userMessage.DATE_OF_BIRTH_IS_REQUIRED
+  },
+  isISO8601: {
+    options: {
+      strict: true,
+      strictSeparator: true
+    },
+    errorMessage: userMessage.DATE_OF_BIRTH_MUST_BE_ISO8601
+  }
+}
+
+const nameSchema: ParamSchema = {
+  notEmpty: {
+    errorMessage: userMessage.NAME_IS_REQUIRED
+  },
+  isString: {
+    errorMessage: userMessage.NAME_MUST_BE_A_STRING
+  },
+  isLength: {
+    options: {
+      min: 1,
+      max: 100
+    },
+    errorMessage: userMessage.NAME_LENGTH_MUST_BE_FROM_1_TO_100
+  },
+  trim: true
+}
 export const registerValidator = validate(
   checkSchema(
     {
-      name: {
-        notEmpty: {
-          errorMessage: userMessage.NAME_IS_REQUIRED
-        },
-        isString: {
-          errorMessage: userMessage.NAME_MUST_BE_A_STRING
-        },
-        isLength: {
-          options: {
-            min: 1,
-            max: 100
-          },
-          errorMessage: userMessage.NAME_LENGTH_MUST_BE_FROM_1_TO_100
-        },
-        trim: true
-      },
+      name: nameSchema,
       email: {
         notEmpty: {
           errorMessage: userMessage.EMAIL_IS_REQUIRED
@@ -217,18 +250,7 @@ export const registerValidator = validate(
           errorMessage: userMessage.CONFIRM_PASSWORD_MUST_BE_THE_SAME_AS_PASSWORD
         }
       },
-      date_of_birth: {
-        notEmpty: {
-          errorMessage: userMessage.DATE_OF_BIRTH_IS_REQUIRED
-        },
-        isISO8601: {
-          options: {
-            strict: true,
-            strictSeparator: true
-          },
-          errorMessage: userMessage.DATE_OF_BIRTH_MUST_BE_ISO8601
-        }
-      }
+      date_of_birth: dateOfBirthSchema
     },
     ['body']
   )
@@ -473,4 +495,90 @@ export const resetPasswordValidator = validate(
     confirm_password: confirmPasswordSchema,
     forgot_password_token: forgotPasswordTokenSchema
   })
+)
+
+export const verifiedUserValidator = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { verify } = req.decoded_authorization as TokenPayload
+  if (verify !== UserVerifyStatus.Verified) {
+    console.log(111)
+    return next(
+      new ErrorWithStatus({
+        message: userMessage.USER_NOT_VERIFIED,
+        status: httpStatus.FORBIDDEN
+      })
+    )
+  }
+  next()
+}
+
+export const updateMeValidator = validate(
+  checkSchema(
+    {
+      name: { ...nameSchema, optional: true, notEmpty: undefined },
+      date_of_birth: { ...dateOfBirthSchema, optional: true },
+      bio: {
+        optional: true,
+        isString: {
+          errorMessage: userMessage.BIO_MUST_BE_A_STRING
+        },
+        isLength: {
+          options: {
+            min: 1,
+            max: 200
+          },
+          errorMessage: userMessage.BIO_LENGTH
+        },
+        trim: true
+      },
+      location: {
+        optional: true,
+        isString: {
+          errorMessage: userMessage.LOCATION_MUST_BE_A_STRING
+        },
+        isLength: {
+          options: {
+            min: 1,
+            max: 200
+          },
+          errorMessage: userMessage.LOCATION_LENGTH
+        },
+        trim: true
+      },
+      website: {
+        optional: true,
+        isString: {
+          errorMessage: userMessage.WEBSITE_MUST_BE_A_STRING
+        },
+        isLength: {
+          options: {
+            min: 1,
+            max: 400
+          },
+          errorMessage: userMessage.WEBSITE_LENGTH
+        },
+        trim: true
+      },
+      username: {
+        optional: true,
+        isString: {
+          errorMessage: userMessage.USERNAME_MUST_BE_A_STRING
+        },
+        trim: true,
+        isLength: {
+          options: {
+            min: 1,
+            max: 50
+          },
+          errorMessage: userMessage.USERNAME_LENGTH
+        }
+      },
+      avatar: imageSchema,
+      cover_photo: imageSchema
+    },
+    ['body']
+  )
 )

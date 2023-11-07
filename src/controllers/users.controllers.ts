@@ -12,7 +12,8 @@ import {
   ResetPasswordRequest,
   TokenPayload,
   VerifyEmailBody,
-  VerifyForgotPasswordRequestBody
+  VerifyForgotPasswordRequestBody,
+  updateMeRequestBody
 } from '~/models/requests/User.requests'
 import User from '~/models/schemas/User.schema'
 import databaseService from '~/services/database.services'
@@ -24,7 +25,10 @@ export const loginController = async (
 ) => {
   const user = req.user as User
   const user_id = user._id as ObjectId
-  const result = await userServices.login(user_id.toString())
+  const result = await userServices.login({
+    user_id: user_id.toString(),
+    verify: user.verify
+  })
   return res.json({
     message: userMessage.LOGIN_SUCCESS,
     result
@@ -114,8 +118,9 @@ export const forgotPasswordController = async (
 ) => {
   const user = req.user as User
   const user_id = user._id.toString()
+  const { verify } = user
   console.log('>>> check user id', user_id)
-  const result = await userServices.forgotPassword(user_id)
+  const result = await userServices.forgotPassword({ user_id, verify })
   return res.json(result)
 }
 
@@ -141,4 +146,33 @@ export const resetPasswordController = async (
 
   const result = await userServices.resetPassword(user_id, password)
   return res.json(result)
+}
+
+export const getMeController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  console.log('hihi', req.decoded_authorization)
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const result = await userServices.getMe(user_id)
+  return res.json({
+    message: userMessage.GET_PROFILE_SUCCESS,
+    result
+  })
+}
+
+export const updatedProfileController = async (
+  req: Request<ParamsDictionary, any, updateMeRequestBody>,
+  res: Response,
+  next: NextFunction
+) => {
+  const { user_id } = req.decoded_authorization as TokenPayload
+  const { body } = req
+  console.log('>>> check body', body)
+  const result = await userServices.updateMe(user_id, body)
+  return res.json({
+    message: userMessage.UPDATE_PROFILE_SUCCESS,
+    result
+  })
 }
